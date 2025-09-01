@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Music Player</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="player">
+    <div class="details">
+      <div class="now-playing">PLAYING 1 OF 3</div>
+      <div class="track-art"></div>
+      <div class="track-name">Song Title</div>
+      <div class="track-artist">Artist Name</div>
+      <div class="track-duration">00:00</div>
+    </div>
+    <div class="buttons">
+      <div class="prev-track"><i class="fa fa-step-backward fa-2x"></i></div>
+      <div class="playpause-track"><i class="fa fa-play-circle fa-4x"></i></div>
+      <div class="next-track"><i class="fa fa-step-forward fa-2x"></i></div>
+    </div>
+    <div class="slider_container">
+      <span class="current-time">00:00</span>
+      <input type="range" min="0" max="100" class="seek_slider" value="0">
+      <span class="total-duration">00:00</span>
+    </div>
+    <div class="slider_container">
+      <i class="fa fa-volume-down"></i>
+      <input type="range" min="0" max="100" class="volume_slider" value="80">
+      <i class="fa fa-volume-up"></i>
+    </div>
+    <div class="playlist">
+      <h3>Playlist</h3>
+      <ul class="playlist-songs"></ul>
+    </div>
+    <div class="autoplay">
+      <label>
+        <input type="checkbox" class="autoplay-checkbox"> Autoplay
+      </label>
+    </div>
+    <audio id="audio-player"></audio>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
