@@ -1,22 +1,20 @@
-// main.js
-
 const track_list = [
   {
     name: "First Song",
-    artist: "Artist One",
-    image: "https://source.unsplash.com/Qrspubmx6kE/640x360",
+    artist: "THAMAN",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTksPqePmm7YEKYXWRAokaCcxsSpyr4HTuhlQ&s",
     path: "audio/song1.mp3"
   },
   {
     name: "Second Song",
-    artist: "Artist Two",
-    image: "https://source.unsplash.com/XbZgkZf6h34/640x360",
+    artist: "ANIRUDH",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrFAJdcKlQxHri90BJyMe2lQ4TyI-1gHEtcA&s",
     path: "audio/song2.mp3"
   },
   {
     name: "Third Song",
-    artist: "Artist Three",
-    image: "https://source.unsplash.com/VuR7vh2yJtQ/640x360",
+    artist: "ANIRUDH",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTYt-R58k_xVhvWjcZJx5hN_89h9e86pGHyQ&s",
     path: "audio/song3.mp3"
   }
 ];
@@ -42,6 +40,10 @@ const totalDurationEl = document.querySelector('.total-duration');
 const playlistSongs = document.querySelector('.playlist-songs');
 const autoplayCheckbox = document.querySelector('.autoplay-checkbox');
 
+audio.addEventListener('error', () => {
+  alert("Error loading audio file. Please check the file paths.");
+});
+
 function loadTrack(index) {
   clearInterval(updateTimer);
   resetValues();
@@ -52,11 +54,10 @@ function loadTrack(index) {
   trackName.textContent = track_list[index].name;
   trackArtist.textContent = track_list[index].artist;
 
-  nowPlaying.textContent = `PLAYING ${index+1} OF ${track_list.length}`;
+  nowPlaying.textContent = `PLAYING ${index + 1} OF ${track_list.length}`;
 
   updateTimer = setInterval(seekUpdate, 1000);
 
-  // Highlight current track in playlist
   document.querySelectorAll('.playlist-songs li').forEach((li, i) => {
     li.classList.toggle('active', i === index);
   });
@@ -74,9 +75,14 @@ function playpauseTrack() {
 }
 
 function playTrack() {
-  audio.play();
-  isPlaying = true;
-  playBtn.innerHTML = `<i class="fa fa-pause-circle fa-4x"></i>`;
+  audio.play()
+    .then(() => {
+      isPlaying = true;
+      playBtn.innerHTML = `<i class="fa fa-pause-circle fa-4x"></i>`;
+    })
+    .catch(e => {
+      console.error("Playback prevented:", e);
+    });
 }
 
 function pauseTrack() {
@@ -86,15 +92,13 @@ function pauseTrack() {
 }
 
 function nextTrack() {
-  if (currentTrack < track_list.length - 1) currentTrack++;
-  else currentTrack = 0;
+  currentTrack = (currentTrack + 1) % track_list.length;
   loadTrack(currentTrack);
   playTrack();
 }
 
 function prevTrack() {
-  if (currentTrack > 0) currentTrack--;
-  else currentTrack = track_list.length - 1;
+  currentTrack = (currentTrack - 1 + track_list.length) % track_list.length;
   loadTrack(currentTrack);
   playTrack();
 }
@@ -108,11 +112,9 @@ function setVolume() {
   audio.volume = volumeSlider.value / 100;
 }
 
-// Progress bar update
 function seekUpdate() {
-  let seekPosition = 0;
   if (!isNaN(audio.duration)) {
-    seekPosition = audio.currentTime * (100 / audio.duration);
+    let seekPosition = audio.currentTime * (100 / audio.duration);
     seekSlider.value = seekPosition;
 
     let currentMins = Math.floor(audio.currentTime / 60);
@@ -120,13 +122,18 @@ function seekUpdate() {
     let durationMins = Math.floor(audio.duration / 60);
     let durationSecs = Math.floor(audio.duration % 60);
 
-    currentTimeEl.textContent = `${currentMins<10 ? '0'+currentMins : currentMins}:${currentSecs<10 ? '0'+currentSecs : currentSecs}`;
-    totalDurationEl.textContent = `${durationMins<10 ? '0'+durationMins : durationMins}:${durationSecs<10 ? '0'+durationSecs : durationSecs}`;
+    currentTimeEl.textContent =
+      `${currentMins < 10 ? '0' + currentMins : currentMins}:` +
+      `${currentSecs < 10 ? '0' + currentSecs : currentSecs}`;
+
+    totalDurationEl.textContent =
+      `${durationMins < 10 ? '0' + durationMins : durationMins}:` +
+      `${durationSecs < 10 ? '0' + durationSecs : durationSecs}`;
+
     trackDuration.textContent = totalDurationEl.textContent;
   }
 }
 
-// Playlist functions
 function renderPlaylist() {
   playlistSongs.innerHTML = '';
   track_list.forEach((track, idx) => {
@@ -137,30 +144,26 @@ function renderPlaylist() {
       currentTrack = idx;
       loadTrack(currentTrack);
       playTrack();
-    }
+    };
     playlistSongs.appendChild(li);
   });
 }
 
-// Autoplay feature
-autoplayCheckbox.addEventListener('change', function() {
+autoplayCheckbox.addEventListener('change', function () {
   autoplayEnabled = this.checked;
 });
 
-// Track end event
-audio.addEventListener('ended', function() {
+audio.addEventListener('ended', function () {
   if (autoplayEnabled) nextTrack();
   else pauseTrack();
 });
 
-// UI button event listeners
 playBtn.addEventListener('click', playpauseTrack);
 nextBtn.addEventListener('click', nextTrack);
 prevBtn.addEventListener('click', prevTrack);
-seekSlider.addEventListener('change', seekTo);
+seekSlider.addEventListener('input', seekTo);
 volumeSlider.addEventListener('input', setVolume);
 
-// Initialize
 renderPlaylist();
 loadTrack(currentTrack);
 setVolume();
